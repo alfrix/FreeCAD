@@ -122,42 +122,28 @@ private:
     static std::vector<std::string> HoleCutType_Enums;
 
     /* "None" thread profile */
-    static const char* ThreadSize_None_Enums[];
-    static const char* ThreadClass_None_Enums[];
+    static std::vector<std::string> Thread_None_Enums;
 
     /* ISO metric coarse profile */
-    static const char* ThreadSize_ISOmetric_Enums[];
     static const char* ThreadClass_ISOmetric_Enums[];
     static const double ThreadClass_ISOmetric_data[ThreadClass_ISOmetric_data_size][2];
 
     /* ISO metric fine profile */
-    static const char* ThreadSize_ISOmetricfine_Enums[];
     static const char* ThreadClass_ISOmetricfine_Enums[];
 
     /* UNC profile */
-    static const char* ThreadSize_UNC_Enums[];
     static const char* ThreadClass_UNC_Enums[];
 
     /* UNF profile */
-    static const char* ThreadSize_UNF_Enums[];
     static const char* ThreadClass_UNF_Enums[];
 
     /* UNEF profile */
-    static const char* ThreadSize_UNEF_Enums[];
     static const char* ThreadClass_UNEF_Enums[];
 
-    /* NPT profile */
-    static const char* ThreadSize_NPT_Enums[];
-
-    /* BSP profile */
-    static const char* ThreadSize_BSP_Enums[];
-
     /* BSW profile */
-    static const char* ThreadSize_BSW_Enums[];
     static const char* ThreadClass_BSW_Enums[];
 
     /* BSF profile */
-    static const char* ThreadSize_BSF_Enums[];
     static const char* ThreadClass_BSF_Enums[];
 
     static const double ThreadRunout[ThreadRunout_size][2];
