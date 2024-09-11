@@ -61,14 +61,17 @@ namespace PartDesign {
 
 /* TRANSLATOR PartDesign::Hole */
 
-const char* Hole::DepthTypeEnums[]                   = { "Dimension", "ThroughAll", /*, "UpToFirst", */ nullptr };
-const char* Hole::ThreadDepthTypeEnums[]             = { "Hole Depth", "Dimension", "Tapped (DIN76)",  nullptr };
-const char* Hole::ThreadTypeEnums[]                  = { "None", "ISOMetricProfile", "ISOMetricFineProfile", "UNC", "UNF", "UNEF", "NPT", "BSP", "BSW", "BSF", nullptr};
-const char* Hole::ClearanceMetricEnums[]             = { "Standard", "Close", "Wide", nullptr};
-const char* Hole::ClearanceUTSEnums[]                = { "Normal", "Close", "Loose", nullptr };
-const char* Hole::DrillPointEnums[]                  = { "Flat", "Angled", nullptr};
-std::vector<std::string> Hole::HoleCutType_Enums     = { "None", "Counterbore", "Countersink", "Counterdrill" };
-std::vector<std::string> Hole::Thread_None_Enums     = { "None" };
+const std::vector<std::string> Hole::DepthTypeEnums        = { "Dimension", "ThroughAll", /*, "UpToFirst", */ };
+const std::vector<std::string> Hole::ThreadDepthTypeEnums  = { "Hole Depth", "Dimension", "Tapped (DIN76)" };
+const std::vector<std::string> Hole::ThreadTypeEnums       = { "None", "ISOMetricProfile", "ISOMetricFineProfile",
+                                                               "UNC", "UNF", "UNEF", "NPT",
+                                                               "BSP", "BSW", "BSF",
+                                                             };
+const std::vector<std::string> Hole::ClearanceMetricEnums  = { "Standard", "Close", "Wide" };
+const std::vector<std::string> Hole::ClearanceUTSEnums     = { "Normal", "Close", "Loose" };
+const std::vector<std::string> Hole::DrillPointEnums       = { "Flat", "Angled" };
+std::vector<std::string> Hole::HoleCutType_Enums           = { "None", "Counterbore", "Countersink", "Counterdrill" };
+const std::vector<std::string> Hole::Thread_None_Enums     = { "None" };
 
 /* Sources:
   http://www.engineeringtoolbox.com/metric-threads-d_777.html
@@ -609,10 +612,6 @@ const Hole::UTSClearanceDefinition Hole::UTSHoleDiameters[22] =
         { "1 1/2", 39.7, 41.3, 44.0 }
 };
 
-
-const char* Hole::ThreadClass_ISOmetric_Enums[]  = { "4G", "4H", "5G", "5H", "6G", "6H", "7G", "7H","8G", "8H", nullptr };
-const char* Hole::ThreadClass_ISOmetricfine_Enums[]  = { "4G", "4H", "5G", "5H", "6G", "6H", "7G", "7H","8G", "8H", nullptr };
-
 // ISO 965-1:2013 ISO general purpose metric screw threads - Tolerances - Part 1
 // Table 1 - Fundamentral deviations for internal threads ...
 // reproduced in: https://www.accu.co.uk/en/p/134-iso-metric-thread-tolerances [retrieved: 2021-01-11]
@@ -676,22 +675,14 @@ const double Hole::ThreadRunout[ThreadRunout_size][2] = {
 
 /* Details from https://en.wikipedia.org/wiki/Unified_Thread_Standard */
 
-/* UTS coarse */
-const char* Hole::ThreadClass_UNC_Enums[]  = { "1B", "2B", "3B", nullptr };
+/* Thread Classes */
+const std::vector<std::string> Hole::ThreadClass_ISOmetric_Enums  = {
+    "4G", "4H", "5G", "5H", "6G", "6H", "7G", "7H", "8G", "8H"
+};
+const std::vector<std::string> Hole::ThreadClass_UTS_Enums  = { "1B", "2B", "3B" };
+const std::vector<std::string> Hole::ThreadClass_BS_Enums   = { "Medium", "Normal" };
 
-/* UTS fine */
-const char* Hole::ThreadClass_UNF_Enums[]  = { "1B", "2B", "3B", nullptr };
-
-/* UTS extrafine */
-const char* Hole::ThreadClass_UNEF_Enums[] = { "1B", "2B", "3B", nullptr };
-
-/* BSW */
-const char* Hole::ThreadClass_BSW_Enums[] = { "Medium", "Normal", nullptr };
-
-/* BSF */
-const char* Hole::ThreadClass_BSF_Enums[] = { "Medium", "Normal", nullptr };
-
-const char* Hole::ThreadDirectionEnums[]  = { "Right", "Left", nullptr};
+const std::vector<std::string> Hole::ThreadDirectionEnums   = { "Right", "Left" };
 
 PROPERTY_SOURCE(PartDesign::Hole, PartDesign::ProfileBased)
 
@@ -1370,7 +1361,7 @@ void Hole::onChanged(const App::Property* prop)
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
         else if (type == "ISOMetricFineProfile") {
-            ThreadClass.setEnums(ThreadClass_ISOmetricfine_Enums);
+            ThreadClass.setEnums(ThreadClass_ISOmetric_Enums);
             ThreadFit.setEnums(ClearanceMetricEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
@@ -1386,7 +1377,7 @@ void Hole::onChanged(const App::Property* prop)
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
         else if (type == "UNC") {
-            ThreadClass.setEnums(ThreadClass_UNC_Enums);
+            ThreadClass.setEnums(ThreadClass_UTS_Enums);
             ThreadFit.setEnums(ClearanceUTSEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
@@ -1402,7 +1393,7 @@ void Hole::onChanged(const App::Property* prop)
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
         else if (type == "UNF") {
-            ThreadClass.setEnums(ThreadClass_UNF_Enums);
+            ThreadClass.setEnums(ThreadClass_UTS_Enums);
             ThreadFit.setEnums(ClearanceUTSEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
@@ -1418,7 +1409,7 @@ void Hole::onChanged(const App::Property* prop)
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
         else if (type == "UNEF") {
-            ThreadClass.setEnums(ThreadClass_UNEF_Enums);
+            ThreadClass.setEnums(ThreadClass_UTS_Enums);
             ThreadFit.setEnums(ClearanceUTSEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
@@ -1458,7 +1449,7 @@ void Hole::onChanged(const App::Property* prop)
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
         else if (type == "BSW") {
-            ThreadClass.setEnums(ThreadClass_BSW_Enums);
+            ThreadClass.setEnums(ThreadClass_BS_Enums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             ThreadFit.setReadOnly(Threaded.getValue());
@@ -1470,7 +1461,7 @@ void Hole::onChanged(const App::Property* prop)
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
         else if (type == "BSF") {
-            ThreadClass.setEnums(ThreadClass_BSF_Enums);
+            ThreadClass.setEnums(ThreadClass_BS_Enums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             ThreadFit.setReadOnly(Threaded.getValue());

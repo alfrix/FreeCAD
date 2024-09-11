@@ -112,39 +112,25 @@ protected:
     static const App::PropertyAngle::Constraints floatAngle;
 
 private:
-    static const char* DepthTypeEnums[];
-    static const char* ThreadDepthTypeEnums[];
-    static const char* ThreadTypeEnums[];
-    static const char* ClearanceMetricEnums[];
-    static const char* ClearanceUTSEnums[];
-    static const char* DrillPointEnums[];
-    static const char* ThreadDirectionEnums[];
+    static const std::vector<std::string> DepthTypeEnums;
+    static const std::vector<std::string> ThreadDepthTypeEnums;
+    static const std::vector<std::string> ThreadTypeEnums;
+    static const std::vector<std::string> ClearanceMetricEnums;
+    static const std::vector<std::string> ClearanceUTSEnums;
+    static const std::vector<std::string> DrillPointEnums;
+    static const std::vector<std::string> ThreadDirectionEnums;
     static std::vector<std::string> HoleCutType_Enums;
 
     /* "None" thread profile */
-    static std::vector<std::string> Thread_None_Enums;
+    static const std::vector<std::string> Thread_None_Enums;
 
     /* ISO metric coarse profile */
-    static const char* ThreadClass_ISOmetric_Enums[];
     static const double ThreadClass_ISOmetric_data[ThreadClass_ISOmetric_data_size][2];
 
-    /* ISO metric fine profile */
-    static const char* ThreadClass_ISOmetricfine_Enums[];
-
-    /* UNC profile */
-    static const char* ThreadClass_UNC_Enums[];
-
-    /* UNF profile */
-    static const char* ThreadClass_UNF_Enums[];
-
-    /* UNEF profile */
-    static const char* ThreadClass_UNEF_Enums[];
-
-    /* BSW profile */
-    static const char* ThreadClass_BSW_Enums[];
-
-    /* BSF profile */
-    static const char* ThreadClass_BSF_Enums[];
+    /* Thread classes*/
+    static const std::vector<std::string> ThreadClass_ISOmetric_Enums;
+    static const std::vector<std::string> ThreadClass_UTS_Enums;
+    static const std::vector<std::string> ThreadClass_BS_Enums;
 
     static const double ThreadRunout[ThreadRunout_size][2];
 
