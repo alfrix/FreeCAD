@@ -1801,6 +1801,13 @@ App::DocumentObjectExecReturn* Hole::execute()
     TopoShape profileshape;
     try {
         profileshape = getTopoShapeVerifiedFace();
+        if (profileshape.isNull())
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Creating a face from sketch failed"
+                )
+            );
     }
     catch (const Base::Exception& e) {
         return new App::DocumentObjectExecReturn(e.what());
@@ -1812,7 +1819,7 @@ App::DocumentObjectExecReturn* Hole::execute()
         base = getBaseTopoShape();
     }
     catch (const Base::Exception&) {
-        std::string text(
+        return new App::DocumentObjectExecReturn(
             QT_TRANSLATE_NOOP(
                 "Exception",
                 "The requested feature cannot be created. The reason may be that:\n"
@@ -1821,7 +1828,6 @@ App::DocumentObjectExecReturn* Hole::execute()
                 "  - the selected sketch does not belong to the active Body."
             )
         );
-        return new App::DocumentObjectExecReturn(text);
     }
 
     try {
@@ -1832,13 +1838,6 @@ App::DocumentObjectExecReturn* Hole::execute()
         TopLoc_Location invObjLoc = this->getLocation().Inverted();
 
         base.move(invObjLoc);
-
-        if (profileshape.isNull())
-            return new App::DocumentObjectExecReturn(
-                QT_TRANSLATE_NOOP(
-                    "Exception", "Hole error: Creating a face from sketch failed"
-                )
-            );
         profileshape.move(invObjLoc);
 
         /* Build the prototype hole */
@@ -1888,6 +1887,14 @@ App::DocumentObjectExecReturn* Hole::execute()
 
         double TaperedAngleVal =
             Tapered.getValue() ? Base::toRadians(TaperedAngle.getValue()) : Base::toRadians(90.0);
+        if (TaperedAngleVal <= 0.0 || TaperedAngleVal > Base::toRadians(180.0))
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Invalid taper angle"
+                )
+            );
+
         double radiusBottom = Diameter.getValue() / 2.0 - length / tan(TaperedAngleVal);
 
         double radius = Diameter.getValue() / 2.0;
@@ -1897,32 +1904,8 @@ App::DocumentObjectExecReturn* Hole::execute()
         double xPosCounter = 0.0;
         double zPosCounter = 0.0;
 
-        if (TaperedAngleVal <= 0.0 || TaperedAngleVal > Base::toRadians(180.0))
-            return new App::DocumentObjectExecReturn(
-                QT_TRANSLATE_NOOP(
-                    "Exception",
-                    "Hole error: Invalid taper angle"
-                )
-            );
-
         if (isCountersink || isCounterbore || isCounterdrill) {
             double holeCutRadius = HoleCutDiameter.getValue() / 2.0;
-            double holeCutDepth = HoleCutDepth.getValue();
-            double countersinkAngle = Base::toRadians(HoleCutCountersinkAngle.getValue() / 2.0);
-
-            if (isCounterbore) {
-                // Counterbore is rendered the same way as a countersink, but with a hardcoded
-                // angle of 90deg
-                countersinkAngle = Base::toRadians(90.0);
-            }
-
-            if (isCountersink) {
-                holeCutDepth = 0.0;
-                // We cannot recalculate the HoleCutDiameter because the previous HoleCutDepth
-                // is unknown. Therefore we cannot know with what HoleCutDepth the current
-                // HoleCutDiameter was calculated.
-            }
-
             if (holeCutRadius < radius)
                 return new App::DocumentObjectExecReturn(
                     QT_TRANSLATE_NOOP(
@@ -1931,21 +1914,31 @@ App::DocumentObjectExecReturn* Hole::execute()
                     )
                 );
 
-            if (holeCutDepth > length)
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP(
-                        "Exception",
-                        "Hole error: Hole cut depth must be less than hole depth"
-                    )
-                );
+            double holeCutDepth = HoleCutDepth.getValue();
+            if (isCountersink) {
+                holeCutDepth = 0.0;
+                // We cannot recalculate the HoleCutDiameter because the previous HoleCutDepth
+                // is unknown. Therefore we cannot know with what HoleCutDepth the current
+                // HoleCutDiameter was calculated.
+            } else {
+                if (holeCutDepth > length)
+                    return new App::DocumentObjectExecReturn(
+                        QT_TRANSLATE_NOOP(
+                            "Exception",
+                            "Hole error: Hole cut depth must be less than hole depth"
+                        )
+                    );
+                if (holeCutDepth < 0.0)
+                    return new App::DocumentObjectExecReturn(
+                        QT_TRANSLATE_NOOP(
+                            "Exception",
+                            "Hole error: Hole cut depth must be greater or equal to zero"
+                        )
+                    );
+            }
 
-            if (holeCutDepth < 0.0)
-                return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP(
-                        "Exception",
-                        "Hole error: Hole cut depth must be greater or equal to zero"
-                    )
-                );
+            double countersinkAngle =
+                isCounterbore ? Base::toRadians(90.0) : Base::toRadians(HoleCutCountersinkAngle.getValue() / 2.0);
 
             // Top point
             gp_Pnt newPoint = toPnt(holeCutRadius * xDir);
@@ -2001,7 +1994,6 @@ App::DocumentObjectExecReturn* Hole::execute()
         else if (drillPoint == "Angled") {
             double drillPointAngle = Base::toRadians((180.0 - DrillPointAngle.getValue()) / 2.0);
             gp_Pnt newPoint;
-            bool isDrillForDepth = DrillForDepth.getValue();
 
             // the angle is in any case > 0 and < 90 but nevertheless this safeguard:
             if (drillPointAngle <= 0.0 || drillPointAngle >= Base::toRadians(180.0))
@@ -2014,6 +2006,7 @@ App::DocumentObjectExecReturn* Hole::execute()
 
             // if option to take drill point size into account
             // the next wire point is the intersection of the drill edge and the hole edge
+            bool isDrillForDepth = DrillForDepth.getValue();
             if (isDrillForDepth) {
                 computeIntersection(gp_Pnt(0, -length, 0),
                     gp_Pnt(radius, radius * tan(drillPointAngle) - length, 0),
