@@ -1798,7 +1798,7 @@ static gp_Pnt toPnt(gp_Vec dir)
 
 App::DocumentObjectExecReturn* Hole::execute()
 {
-     TopoShape profileshape;
+    TopoShape profileshape;
     try {
         profileshape = getTopoShapeVerifiedFace();
     }
