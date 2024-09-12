@@ -1349,147 +1349,33 @@ void Hole::onChanged(const App::Property* prop)
             Threaded.setValue(false);
             ModelThread.setValue(false);
             UseCustomThreadClearance.setValue(false);
+        } else {
+            Threaded.setReadOnly(false);
+            ThreadSize.setReadOnly(false);
+            // thread class and direction are only sensible if threaded
+            // fit only sensible if not threaded
+            ThreadFit.setReadOnly(Threaded.getValue());
+            ThreadClass.setReadOnly(!Threaded.getValue());
+            Diameter.setReadOnly(true);
+            ModelThread.setReadOnly(!Threaded.getValue());
+            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
+            ThreadDepthType.setReadOnly(!Threaded.getValue());
+            ThreadDepth.setReadOnly(!Threaded.getValue());
         }
-        else if (type == "ISOMetricProfile") {
+        if (type == "ISOMetricProfile" || type == "ISOMetricFineProfile") {
             ThreadClass.setEnums(ThreadClass_ISOmetric_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            // thread class and direction are only sensible if threaded
-            // fit only sensible if not threaded
-            ThreadFit.setReadOnly(Threaded.getValue());
-            ThreadClass.setReadOnly(!Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
         }
-        else if (type == "ISOMetricFineProfile") {
-            ThreadClass.setEnums(ThreadClass_ISOmetric_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            // thread class and direction are only sensible if threaded
-            // fit only sensible if not threaded
-            ThreadFit.setReadOnly(Threaded.getValue());
-            ThreadClass.setReadOnly(!Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
-        }
-        else if (type == "UNC") {
+        else if (type == "UNC" || type == "UNF" || type == "UNEF") {
             ThreadClass.setEnums(ThreadClass_UTS_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            // thread class and direction are only sensible if threaded
-            // fit only sensible if not threaded
-            ThreadFit.setReadOnly(Threaded.getValue());
-            ThreadClass.setReadOnly(!Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
         }
-        else if (type == "UNF") {
-            ThreadClass.setEnums(ThreadClass_UTS_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            // thread class and direction are only sensible if threaded
-            // fit only sensible if not threaded
-            ThreadFit.setReadOnly(Threaded.getValue());
-            ThreadClass.setReadOnly(!Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
-        }
-        else if (type == "UNEF") {
-            ThreadClass.setEnums(ThreadClass_UTS_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            // thread class and direction are only sensible if threaded
-            // fit only sensible if not threaded
-            ThreadFit.setReadOnly(Threaded.getValue());
-            ThreadClass.setReadOnly(!Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
-        }
-        else if (type == "BSP") {
+        else if (type == "BSP" || type == "NPT") {
             ThreadClass.setEnums(Thread_None_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            ThreadFit.setReadOnly(Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
         }
-        else if (type == "NPT") {
-            ThreadClass.setEnums(Thread_None_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            ThreadFit.setReadOnly(Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
-        }
-        else if (type == "BSW") {
+        else if (type == "BSW" || type == "BSF") {
             ThreadClass.setEnums(ThreadClass_BS_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            ThreadFit.setReadOnly(Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
-        }
-        else if (type == "BSF") {
-            ThreadClass.setEnums(ThreadClass_BS_Enums);
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            ThreadFit.setReadOnly(Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
         }
 
         if (holeCutTypeStr == "None") {
