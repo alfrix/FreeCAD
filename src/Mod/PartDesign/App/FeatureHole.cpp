@@ -67,8 +67,7 @@ const std::vector<std::string> Hole::ThreadTypeEnums       = { "None", "ISOMetri
                                                                "UNC", "UNF", "UNEF", "NPT",
                                                                "BSP", "BSW", "BSF",
                                                              };
-const std::vector<std::string> Hole::ClearanceMetricEnums  = { "Standard", "Close", "Wide" };
-const std::vector<std::string> Hole::ClearanceUTSEnums     = { "Normal", "Close", "Loose" };
+const std::vector<std::string> Hole::ClearanceEnums        = { "Normal", "Tight", "Loose" };
 const std::vector<std::string> Hole::DrillPointEnums       = { "Flat", "Angled" };
 std::vector<std::string> Hole::HoleCutType_Enums           = { "None", "Counterbore", "Countersink", "Counterdrill" };
 const std::vector<std::string> Hole::Thread_None_Enums     = { "None" };
@@ -715,7 +714,7 @@ Hole::Hole()
     ThreadClass.setEnums(Thread_None_Enums);
 
     ADD_PROPERTY_TYPE(ThreadFit, (0L), "Hole", App::Prop_None, "Clearance hole fit");
-    ThreadFit.setEnums(ClearanceMetricEnums);
+    ThreadFit.setEnums(ClearanceEnums);
 
     ADD_PROPERTY_TYPE(Diameter, (6.0), "Hole", App::Prop_None, "Diameter");
     Diameter.setConstraints(&diameterRange);
@@ -1353,7 +1352,6 @@ void Hole::onChanged(const App::Property* prop)
         }
         else if (type == "ISOMetricProfile") {
             ThreadClass.setEnums(ThreadClass_ISOmetric_Enums);
-            ThreadFit.setEnums(ClearanceMetricEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             // thread class and direction are only sensible if threaded
@@ -1371,7 +1369,6 @@ void Hole::onChanged(const App::Property* prop)
         }
         else if (type == "ISOMetricFineProfile") {
             ThreadClass.setEnums(ThreadClass_ISOmetric_Enums);
-            ThreadFit.setEnums(ClearanceMetricEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             // thread class and direction are only sensible if threaded
@@ -1389,7 +1386,6 @@ void Hole::onChanged(const App::Property* prop)
         }
         else if (type == "UNC") {
             ThreadClass.setEnums(ThreadClass_UTS_Enums);
-            ThreadFit.setEnums(ClearanceUTSEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             // thread class and direction are only sensible if threaded
@@ -1407,7 +1403,6 @@ void Hole::onChanged(const App::Property* prop)
         }
         else if (type == "UNF") {
             ThreadClass.setEnums(ThreadClass_UTS_Enums);
-            ThreadFit.setEnums(ClearanceUTSEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             // thread class and direction are only sensible if threaded
@@ -1425,7 +1420,6 @@ void Hole::onChanged(const App::Property* prop)
         }
         else if (type == "UNEF") {
             ThreadClass.setEnums(ThreadClass_UTS_Enums);
-            ThreadFit.setEnums(ClearanceUTSEnums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             // thread class and direction are only sensible if threaded
