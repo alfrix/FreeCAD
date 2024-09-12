@@ -115,8 +115,7 @@ private:
     static const std::vector<std::string> DepthTypeEnums;
     static const std::vector<std::string> ThreadDepthTypeEnums;
     static const std::vector<std::string> ThreadTypeEnums;
-    static const std::vector<std::string> ClearanceMetricEnums;
-    static const std::vector<std::string> ClearanceUTSEnums;
+    static const std::vector<std::string> ClearanceEnums;
     static const std::vector<std::string> DrillPointEnums;
     static const std::vector<std::string> ThreadDirectionEnums;
     static std::vector<std::string> HoleCutType_Enums;
