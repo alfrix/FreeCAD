@@ -582,7 +582,7 @@ const double Hole::metricHoleDiameters[51][4] =
 const Hole::UTSClearanceDefinition Hole::UTSHoleDiameters[22] =
 {
     /* UTS clearance hole diameters according to ASME B18.2.8 */
-    // for information: the norm defines a drill bit number (that is in turn standardized in another ASME norm).
+    // for information: the norm defines a drill bit number (standardized in another ASME norm).
     // as result the norm defines a minimal clearance which is the diameter of that drill bit.
     // we use here this minimal clearance as the theoretical exact hole diameter as this is also done in the ISO norm.
     // {screw class, close, normal, loose}
@@ -644,7 +644,8 @@ const double Hole::ThreadClass_ISOmetric_data[ThreadClass_ISOmetric_data_size][2
     {8.0,   0.100}
 };
 
-/* According to DIN 76-1 (Thread run-outs and thread undercuts - Part 1: For ISO metric threads in accordance with DIN 13-1) */
+/* According to DIN 76-1 Thread run-outs and thread undercuts */
+/* Part 1: For ISO metric threads in accordance with DIN 13-1) */
 const double Hole::ThreadRunout[ThreadRunout_size][2] = {
 //  Pitch    e1
     {0.2,   1.3},
@@ -686,7 +687,11 @@ const std::vector<std::string> Hole::ThreadDirectionEnums   = { "Right", "Left" 
 
 PROPERTY_SOURCE(PartDesign::Hole, PartDesign::ProfileBased)
 
-const App::PropertyAngle::Constraints Hole::floatAngle = { Base::toDegrees<double>(Precision::Angular()), 180.0 - Base::toDegrees<double>(Precision::Angular()), 1.0 };
+const App::PropertyAngle::Constraints Hole::floatAngle = {
+    Base::toDegrees<double>(Precision::Angular()),
+    180.0 - Base::toDegrees<double>(Precision::Angular()),
+    1.0
+};
 // OCC can only create holes with a min diameter of 10 times the Precision::Confusion()
 const App::PropertyQuantityConstraint::Constraints diameterRange = { 10 * Precision::Confusion(), FLT_MAX, 1.0 };
 
@@ -760,7 +765,9 @@ Hole::Hole()
 
     ADD_PROPERTY_TYPE(UseCustomThreadClearance, (false), "Hole", App::Prop_None, "Use custom thread clearance");
 
-    ADD_PROPERTY_TYPE(CustomThreadClearance, (0.0), "Hole", App::Prop_None, "Custom thread clearance (overrides ThreadClass)");
+    ADD_PROPERTY_TYPE(
+        CustomThreadClearance, (0.0), "Hole", App::Prop_None, "Custom thread clearance (overrides ThreadClass)"
+    );
 
 }
 
@@ -1356,7 +1363,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1372,7 +1381,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1388,7 +1399,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1404,7 +1417,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1420,7 +1435,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1432,7 +1449,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1444,7 +1463,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1456,7 +1477,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1468,7 +1491,9 @@ void Hole::onChanged(const App::Property* prop)
             Diameter.setReadOnly(true);
             ModelThread.setReadOnly(!Threaded.getValue());
             UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            CustomThreadClearance.setReadOnly(
+                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
+            );
             ThreadDepthType.setReadOnly(!Threaded.getValue());
             ThreadDepth.setReadOnly(!Threaded.getValue());
         }
@@ -1793,10 +1818,15 @@ App::DocumentObjectExecReturn* Hole::execute()
         base = getBaseTopoShape();
     }
     catch (const Base::Exception&) {
-        std::string text(QT_TRANSLATE_NOOP("Exception", "The requested feature cannot be created. The reason may be that:\n"
-            "  - the active Body does not contain a base shape, so there is no\n"
-            "  material to be removed;\n"
-            "  - the selected sketch does not belong to the active Body."));
+        std::string text(
+            QT_TRANSLATE_NOOP(
+                "Exception",
+                "The requested feature cannot be created. The reason may be that:\n"
+                "  - the active Body does not contain a base shape, so there is no\n"
+                "  material to be removed;\n"
+                "  - the selected sketch does not belong to the active Body."
+            )
+        );
         return new App::DocumentObjectExecReturn(text);
     }
 
@@ -1811,7 +1841,10 @@ App::DocumentObjectExecReturn* Hole::execute()
 
         if (profileshape.isNull())
             return new App::DocumentObjectExecReturn(
-                QT_TRANSLATE_NOOP("Exception", "Hole error: Creating a face from sketch failed"));
+                QT_TRANSLATE_NOOP(
+                    "Exception", "Hole error: Creating a face from sketch failed"
+                )
+            );
         profileshape.move(invObjLoc);
 
         /* Build the prototype hole */
@@ -1836,10 +1869,19 @@ App::DocumentObjectExecReturn* Hole::execute()
         }
         else
             return new App::DocumentObjectExecReturn(
-                QT_TRANSLATE_NOOP("Exception", "Hole error: Unsupported length specification"));
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Unsupported length specification"
+                )
+            );
 
         if (length <= 0.0)
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Invalid hole depth"));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Invalid hole depth"
+                )
+            );
 
         BRepBuilderAPI_MakeWire mkWire;
         const std::string holeCutType = HoleCutType.getValueAsString();
@@ -1862,7 +1904,12 @@ App::DocumentObjectExecReturn* Hole::execute()
         double zPosCounter = 0.0;
 
         if (TaperedAngleVal <= 0.0 || TaperedAngleVal > Base::toRadians(180.0))
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Invalid taper angle"));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Invalid taper angle"
+                )
+            );
 
         if (isCountersink || isCounterbore || isCounterdrill) {
             double holeCutRadius = HoleCutDiameter.getValue() / 2.0;
@@ -1883,15 +1930,28 @@ App::DocumentObjectExecReturn* Hole::execute()
             }
 
             if (holeCutRadius < radius)
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Hole cut diameter too small"));
+                return new App::DocumentObjectExecReturn(
+                    QT_TRANSLATE_NOOP(
+                        "Exception",
+                        "Hole error: Hole cut diameter too small"
+                    )
+                );
 
             if (holeCutDepth > length)
                 return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Hole error: Hole cut depth must be less than hole depth"));
+                    QT_TRANSLATE_NOOP(
+                        "Exception",
+                        "Hole error: Hole cut depth must be less than hole depth"
+                    )
+                );
 
             if (holeCutDepth < 0.0)
                 return new App::DocumentObjectExecReturn(
-                    QT_TRANSLATE_NOOP("Exception", "Hole error: Hole cut depth must be greater or equal to zero"));
+                    QT_TRANSLATE_NOOP(
+                        "Exception",
+                        "Hole error: Hole cut depth must be greater or equal to zero"
+                    )
+                );
 
             // Top point
             gp_Pnt newPoint = toPnt(holeCutRadius * xDir);
@@ -1913,7 +1973,12 @@ App::DocumentObjectExecReturn* Hole::execute()
                                 gp_Pnt(radiusBottom, -length, 0), xPosCounter, zPosCounter);
 
             if (-length > zPosCounter)
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Invalid countersink"));
+                return new App::DocumentObjectExecReturn(
+                    QT_TRANSLATE_NOOP(
+                        "Exception",
+                        "Hole error: Invalid countersink"
+                    )
+                );
 
             lengthCounter = zPosCounter;
             newPoint = toPnt(xPosCounter * xDir + zPosCounter * zDir);
@@ -1946,7 +2011,12 @@ App::DocumentObjectExecReturn* Hole::execute()
 
             // the angle is in any case > 0 and < 90 but nevertheless this safeguard:
             if (drillPointAngle <= 0.0 || drillPointAngle >= Base::toRadians(180.0))
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Invalid drill point angle"));
+                return new App::DocumentObjectExecReturn(
+                    QT_TRANSLATE_NOOP(
+                        "Exception",
+                        "Hole error: Invalid drill point angle"
+                    )
+                );
 
             // if option to take drill point size into account
             // the next wire point is the intersection of the drill edge and the hole edge
@@ -1956,7 +2026,12 @@ App::DocumentObjectExecReturn* Hole::execute()
                     gp_Pnt(radius, 0, 0),
                     gp_Pnt(radiusBottom, -length, 0), xPosDrill, zPosDrill);
                 if (zPosDrill > 0 || zPosDrill >= lengthCounter)
-                    return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Invalid drill point"));
+                    return new App::DocumentObjectExecReturn(
+                        QT_TRANSLATE_NOOP(
+                            "Exception",
+                            "Hole error: Invalid drill point"
+                        )
+                    );
 
                 newPoint = toPnt(xPosDrill * xDir + zPosDrill * zDir);
                 mkWire.Add(BRepBuilderAPI_MakeEdge(lastPoint, newPoint));
@@ -1990,11 +2065,21 @@ App::DocumentObjectExecReturn* Hole::execute()
         double angle = Base::toRadians<double>(360.0);
         BRepPrimAPI_MakeRevol RevolMaker(face, gp_Ax1(firstPoint, zDir), angle);
         if (!RevolMaker.IsDone())
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Could not revolve sketch"));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Could not revolve sketch"
+                )
+            );
 
         TopoDS_Shape protoHole = RevolMaker.Shape();
         if (protoHole.IsNull())
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Hole error: Resulting shape is empty"));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Hole error: Resulting shape is empty"
+                )
+            );
 
 
         // Make thread
@@ -2004,7 +2089,12 @@ App::DocumentObjectExecReturn* Hole::execute()
             // fuse the thread to the hole
             BRepAlgoAPI_Fuse mkFuse(protoHole, protoThread);
             if (!mkFuse.IsDone())
-                return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Error: Adding the thread failed"));
+                return new App::DocumentObjectExecReturn(
+                    QT_TRANSLATE_NOOP(
+                        "Exception",
+                        "Error: Adding the thread failed"
+                    )
+                );
 
             // we reuse the name protoHole (only now it is threaded)
             protoHole = mkFuse.Shape();
@@ -2016,7 +2106,12 @@ App::DocumentObjectExecReturn* Hole::execute()
         // For some reason it is faster to do the cut through a BooleanOperation.
         BRepAlgoAPI_Cut mkBool(base.getShape(), holes);
         if (!mkBool.IsDone()) {
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Boolean operation failed"));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Boolean operation failed"
+                )
+            );
         }
         TopoDS_Shape result = mkBool.Shape();
 
@@ -2024,12 +2119,21 @@ App::DocumentObjectExecReturn* Hole::execute()
         // We have to get the solids (fuse sometimes creates compounds)
         base = getSolid(result);
         if (base.isNull())
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception", "Resulting shape is not a solid"));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Resulting shape is not a solid"
+                )
+            );
         base = refineShapeIfActive(base);
 
         if (!isSingleSolidRuleSatisfied(base.getShape())) {
             return new App::DocumentObjectExecReturn(
-                QT_TRANSLATE_NOOP("Exception", "Result has multiple solids: that is not currently supported."));
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Result has multiple solids: that is not currently supported."
+                )
+            );
         }
 
         this->Shape.setValue(base);
@@ -2040,10 +2144,14 @@ App::DocumentObjectExecReturn* Hole::execute()
         if (std::string(e.GetMessageString()) == "TopoDS::Face"
             && (std::string(DepthType.getValueAsString()) == "UpToFirst"
                 || std::string(DepthType.getValueAsString()) == "UpToFace"))
-            return new App::DocumentObjectExecReturn(QT_TRANSLATE_NOOP("Exception",
-                "Could not create face from sketch.\n"
-                "Intersecting sketch entities or multiple faces in a sketch are not allowed "
-                "for making a pocket up to a face."));
+            return new App::DocumentObjectExecReturn(
+                QT_TRANSLATE_NOOP(
+                    "Exception",
+                    "Could not create face from sketch.\n"
+                    "Intersecting sketch entities or multiple faces in a sketch are not allowed "
+                    "for making a pocket up to a face."
+                )
+            );
         else
             return new App::DocumentObjectExecReturn(e.GetMessageString());
     }
@@ -2161,10 +2269,20 @@ TopoDS_Shape Hole::makeThread(const gp_Vec& xDir, const gp_Vec& zDir, double len
     int threadType = ThreadType.getValue();
     int threadSize = ThreadSize.getValue();
     if (threadType < 0) {
-        throw Base::IndexError(QT_TRANSLATE_NOOP("Exception", "Thread type out of range"));
+        throw Base::IndexError(
+            QT_TRANSLATE_NOOP(
+                "Exception",
+                "Thread type out of range"
+            )
+        );
     }
     if (threadSize < 0) {
-        throw Base::IndexError(QT_TRANSLATE_NOOP("Exception", "Thread size out of range"));
+        throw Base::IndexError(
+            QT_TRANSLATE_NOOP(
+                "Exception",
+                "Thread size out of range"
+            )
+        );
     }
 
     bool leftHanded = (bool)ThreadDirection.getValue();
@@ -2294,7 +2412,12 @@ TopoDS_Shape Hole::makeThread(const gp_Vec& xDir, const gp_Vec& zDir, double len
     mkPS.SetMode(true);  //This is for frenet
     mkPS.Add(threadWire);
     if (!mkPS.IsReady())
-        throw Base::CADKernelError(QT_TRANSLATE_NOOP("Exception", "Error: Thread could not be built"));
+        throw Base::CADKernelError(
+            QT_TRANSLATE_NOOP(
+                "Exception",
+                "Error: Thread could not be built"
+            )
+        );
     TopoDS_Shape shell = mkPS.Shape();
 
     // create faces at the ends of the pipe shell
@@ -2319,7 +2442,12 @@ TopoDS_Shape Hole::makeThread(const gp_Vec& xDir, const gp_Vec& zDir, double len
     BRepBuilderAPI_MakeSolid mkSolid;
     mkSolid.Add(TopoDS::Shell(sewer.SewedShape()));
     if (!mkSolid.IsDone())
-        throw Base::CADKernelError(QT_TRANSLATE_NOOP("Exception", "Error: Result is not a solid"));
+        throw Base::CADKernelError(
+            QT_TRANSLATE_NOOP(
+                "Exception",
+                "Error: Result is not a solid"
+            )
+        );
     TopoDS_Shape result = mkSolid.Shape();
 
     // check if the algorithm has confused the inside and outside of the solid
