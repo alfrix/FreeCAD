@@ -661,34 +661,23 @@ void TaskHoleParameters::threadTypeChanged(int index)
             // we can set it
             ui->ThreadSize->setCurrentIndex(threadSizeIndex);
         }
-        // the names of the clearance types are different in ISO and UTS
-        ui->ThreadFit->setItemText(
-            0,
-            QCoreApplication::translate("TaskHoleParameters", "Standard", nullptr));
-        ui->ThreadFit->setItemText(
-            1,
-            QCoreApplication::translate("TaskHoleParameters", "Close", nullptr));
-        ui->ThreadFit->setItemText(
-            2,
-            QCoreApplication::translate("TaskHoleParameters", "Wide", nullptr));
     }
     else if (TypeClass == QByteArray("UTS")) {
         // for all UTS types the size entries are the same
         int threadSizeIndex = ui->ThreadSize->findText(ThreadSizeString, Qt::MatchContains);
-        if (threadSizeIndex > -1) {
+        if (threadSizeIndex > -1)
             ui->ThreadSize->setCurrentIndex(threadSizeIndex);
-        }
-        // the names of the clearance types are different in ISO and UTS
-        ui->ThreadFit->setItemText(
-            0,
-            QCoreApplication::translate("TaskHoleParameters", "Normal", nullptr));
-        ui->ThreadFit->setItemText(
-            1,
-            QCoreApplication::translate("TaskHoleParameters", "Close", nullptr));
-        ui->ThreadFit->setItemText(
-            2,
-            QCoreApplication::translate("TaskHoleParameters", "Loose", nullptr));
     }
+
+    ui->ThreadFit->setItemText(
+        0,
+        QCoreApplication::translate("TaskHoleParameters", "Normal", nullptr));
+    ui->ThreadFit->setItemText(
+        1,
+        QCoreApplication::translate("TaskHoleParameters", "Tight", nullptr));
+    ui->ThreadFit->setItemText(
+        2,
+        QCoreApplication::translate("TaskHoleParameters", "Loose", nullptr));
 
     // Class and cut type
     // the class and cut types are the same for both TypeClass so we don't need to distinguish
