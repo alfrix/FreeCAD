@@ -1491,16 +1491,12 @@ void Hole::onChanged(const App::Property* prop)
         }
         else { // screw definition
             HoleCutCustomValues.setReadOnly(false);
-            if (HoleCutCustomValues.getValue()) {
-                HoleCutDiameter.setReadOnly(false);
-                HoleCutDepth.setReadOnly(false);
-                // we must not set HoleCutCountersinkAngle here because the info if this can
-                // be enabled is first available in updateHoleCutParams and thus handled there
-                updateHoleCutParams();
-            }
-            else {
-                HoleCutDiameter.setReadOnly(true);
-                HoleCutDepth.setReadOnly(true);
+            const bool customHoleCut = HoleCutCustomValues.getValue();
+            HoleCutDiameter.setReadOnly(!customHoleCut);
+            HoleCutDepth.setReadOnly(!customHoleCut);
+            if (customHoleCut) {
+                updateHoleCutParams(); // this also sets HoleCutCountersinkAngle
+            } else {
                 HoleCutCountersinkAngle.setReadOnly(true);
             }
         }
