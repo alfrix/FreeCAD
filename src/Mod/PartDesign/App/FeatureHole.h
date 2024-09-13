@@ -196,6 +196,7 @@ private:
     void updateDiameterParam();
     void updateThreadDepthParam();
     void readCutDefinitions();
+    void setThreadedStatus();
 
     double getCountersinkAngle() const;
     double getThreadClassClearance() const;

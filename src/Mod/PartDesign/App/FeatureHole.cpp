@@ -721,23 +721,18 @@ Hole::Hole()
 
     ADD_PROPERTY_TYPE(ThreadDirection, (0L), "Hole", App::Prop_None, "Thread direction");
     ThreadDirection.setEnums(ThreadDirectionEnums);
-    ThreadDirection.setReadOnly(true);
 
     ADD_PROPERTY_TYPE(HoleCutType, (0L), "Hole", App::Prop_None, "Head cut type");
     HoleCutType.setEnums(HoleCutType_Enums);
 
     ADD_PROPERTY_TYPE(HoleCutCustomValues, (false), "Hole", App::Prop_None, "Custom cut values");
-    HoleCutCustomValues.setReadOnly(true);
 
     ADD_PROPERTY_TYPE(HoleCutDiameter, (0.0), "Hole", App::Prop_None, "Head cut diameter");
-    HoleCutDiameter.setReadOnly(true);
 
     ADD_PROPERTY_TYPE(HoleCutDepth, (0.0), "Hole", App::Prop_None, "Head cut depth");
-    HoleCutDepth.setReadOnly(true);
 
     ADD_PROPERTY_TYPE(HoleCutCountersinkAngle, (90.0), "Hole", App::Prop_None, "Head cut countersink angle");
     HoleCutCountersinkAngle.setConstraints(&floatAngle);
-    HoleCutCountersinkAngle.setReadOnly(true);
 
     ADD_PROPERTY_TYPE(DepthType, (0L), "Hole", App::Prop_None, "Type");
     DepthType.setEnums(DepthTypeEnums);
@@ -1323,6 +1318,30 @@ std::vector<std::string> getThreadDesignations(const int threadType) {
     return designations;
 }
 
+void Hole::setThreadedStatus()
+{
+    const bool canBeThreaded = ThreadType.getValue();
+    const bool isThreaded = Threaded.getValue();
+    const bool useCustomThreadClearance = UseCustomThreadClearance.getValue();
+    const bool modelThread = ModelThread.getValue();
+
+    Threaded.setReadOnly(!canBeThreaded);
+    ThreadSize.setReadOnly(!canBeThreaded);
+    Diameter.setReadOnly(canBeThreaded);
+    ThreadFit.setReadOnly(isThreaded || !canBeThreaded);
+
+    ThreadClass.setReadOnly(!isThreaded);
+    ThreadDirection.setReadOnly(!isThreaded);
+    ModelThread.setReadOnly(!isThreaded);
+    UseCustomThreadClearance.setReadOnly(!(isThreaded && modelThread));
+    CustomThreadClearance.setReadOnly(!(useCustomThreadClearance && isThreaded && modelThread));
+    ThreadDepthType.setReadOnly(!isThreaded);
+    ThreadDepth.setReadOnly(std::string(ThreadDepthType.getValueAsString()) != "Dimension" || !isThreaded);
+    TaperedAngle.setReadOnly(!Tapered.getValue());
+    if (isThreaded)
+        TaperedAngle.setValue(getThreadProfileAngle());
+}
+
 void Hole::onChanged(const App::Property* prop)
 {
     if (prop == &ThreadType) {
@@ -1336,36 +1355,11 @@ void Hole::onChanged(const App::Property* prop)
         HoleCutType.setEnums(HoleCutType_Enums);
         if (type == "None") {
             ThreadClass.setEnums(Thread_None_Enums);
-            Threaded.setReadOnly(true);
-            ThreadSize.setReadOnly(true);
-            ThreadFit.setReadOnly(true);
-            ThreadClass.setReadOnly(true);
-            Diameter.setReadOnly(false);
-            ModelThread.setReadOnly(true);
-            UseCustomThreadClearance.setReadOnly(true);
-            CustomThreadClearance.setReadOnly(true);
-            ThreadDepth.setReadOnly(true);
-            ThreadDepthType.setReadOnly(true);
             Threaded.setValue(false);
             ModelThread.setValue(false);
             UseCustomThreadClearance.setValue(false);
-        } else {
-            Threaded.setReadOnly(false);
-            ThreadSize.setReadOnly(false);
-            // thread class and direction are only sensible if threaded
-            // fit only sensible if not threaded
-            ThreadFit.setReadOnly(Threaded.getValue());
-            ThreadClass.setReadOnly(!Threaded.getValue());
-            Diameter.setReadOnly(true);
-            ModelThread.setReadOnly(!Threaded.getValue());
-            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
-            CustomThreadClearance.setReadOnly(
-                !Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue()
-            );
-            ThreadDepthType.setReadOnly(!Threaded.getValue());
-            ThreadDepth.setReadOnly(!Threaded.getValue());
         }
-        if (type == "ISOMetricProfile" || type == "ISOMetricFineProfile") {
+        else if (type == "ISOMetricProfile" || type == "ISOMetricFineProfile") {
             ThreadClass.setEnums(ThreadClass_ISOmetric_Enums);
         }
         else if (type == "UNC" || type == "UNF" || type == "UNEF") {
@@ -1377,6 +1371,8 @@ void Hole::onChanged(const App::Property* prop)
         else if (type == "BSW" || type == "BSF") {
             ThreadClass.setEnums(ThreadClass_BS_Enums);
         }
+
+        setThreadedStatus();
 
         if (holeCutTypeStr == "None") {
             HoleCutCustomValues.setReadOnly(true);
@@ -1419,38 +1415,7 @@ void Hole::onChanged(const App::Property* prop)
             updateDiameterParam();
     }
     else if (prop == &Threaded) {
-        std::string type(ThreadType.getValueAsString());
-
-        // thread class and direction are only sensible if threaded
-        // fit only sensible if not threaded
-        if (Threaded.getValue()) {
-            ThreadClass.setReadOnly(false);
-            ThreadDirection.setReadOnly(false);
-            ThreadFit.setReadOnly(true);
-            ModelThread.setReadOnly(false);
-            UseCustomThreadClearance.setReadOnly(false);
-            CustomThreadClearance.setReadOnly(!UseCustomThreadClearance.getValue());
-            ThreadDepthType.setReadOnly(false);
-            ThreadDepth.setReadOnly(std::string(ThreadDepthType.getValueAsString()) != "Dimension");
-            TaperedAngle.setReadOnly(true);
-            TaperedAngle.setValue(getThreadProfileAngle());
-        }
-        else {
-            ThreadClass.setReadOnly(true);
-            ThreadDirection.setReadOnly(true);
-            if (type == "None")
-                ThreadFit.setReadOnly(true);
-            else
-                ThreadFit.setReadOnly(false);
-            ModelThread.setReadOnly(true);
-            UseCustomThreadClearance.setReadOnly(true);
-            CustomThreadClearance.setReadOnly(true);
-            ThreadDepthType.setReadOnly(true);
-            ThreadDepth.setReadOnly(true);
-            TaperedAngle.setReadOnly(!Tapered.getValue());
-        }
-
-        // Diameter parameter depends on this
+        setThreadedStatus();
         updateDiameterParam();
     }
     else if (prop == &ModelThread) {
