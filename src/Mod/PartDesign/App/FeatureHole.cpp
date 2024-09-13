@@ -708,7 +708,7 @@ Hole::Hole()
     ThreadType.setEnums(ThreadTypeEnums);
 
     ADD_PROPERTY_TYPE(ThreadSize, (0L), "Hole", App::Prop_None, "Thread size");
-    ThreadClass.setEnums(Thread_None_Enums);
+    ThreadSize.setEnums(Thread_None_Enums);
 
     ADD_PROPERTY_TYPE(ThreadClass, (0L), "Hole", App::Prop_None, "Thread class");
     ThreadClass.setEnums(Thread_None_Enums);
