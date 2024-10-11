@@ -39,7 +39,7 @@ set(SketcherGui_UIC_SRCS
     SketchMirrorDialog.ui
     SketcherSettings.ui
     SketcherSettingsGrid.ui
-    SketcherSettingsAppearance.ui
+    SketcherSettingsColors.ui
     SketcherSettingsDisplay.ui
     SketchRectangularArrayDialog.ui
     SketcherRegularPolygonDialog.ui

@@ -32,7 +32,7 @@ namespace SketcherGui
 class Ui_SketcherSettings;
 class Ui_SketcherSettingsGrid;
 class Ui_SketcherSettingsDisplay;
-class Ui_SketcherSettingsAppearance;
+class Ui_SketcherSettingsColors;
 class SketcherGeneralWidget;
 /**
  * The SketcherSettings class implements a preference page to change sketcher settings.
@@ -110,13 +110,13 @@ private:
  * The SketcherSettings class implements a preference page to change sketcher settings.
  * @author Werner Mayer
  */
-class SketcherSettingsAppearance: public Gui::Dialog::PreferencePage
+class SketcherSettingsColors: public Gui::Dialog::PreferencePage
 {
     Q_OBJECT
 
 public:
-    explicit SketcherSettingsAppearance(QWidget* parent = nullptr);
-    ~SketcherSettingsAppearance() override;
+    explicit SketcherSettingsColors(QWidget* parent = nullptr);
+    ~SketcherSettingsColors() override;
 
     void saveSettings() override;
     void loadSettings() override;
@@ -125,7 +125,7 @@ protected:
     void changeEvent(QEvent* e) override;
 
 private:
-    std::unique_ptr<Ui_SketcherSettingsAppearance> ui;
+    std::unique_ptr<Ui_SketcherSettingsColors> ui;
 };
 
 }  // namespace SketcherGui
