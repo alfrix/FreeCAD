@@ -67,7 +67,7 @@ namespace PartDesign {
 
 const char* Hole::DepthTypeEnums[]                   = { "Dimension", "ThroughAll", /*, "UpToFirst", */ nullptr };
 const char* Hole::ThreadDepthTypeEnums[]             = { "Hole Depth", "Dimension", "Tapped (DIN76)",  nullptr };
-const char* Hole::ThreadTypeEnums[]                  = { "None", "ISOMetricProfile", "ISOMetricFineProfile", "UNC", "UNF", "UNEF", "NPT", "BSP", "BSW", "BSF", nullptr};
+const char* Hole::ThreadTypeEnums[]                  = { "None", "ISOMetricProfile", "ISOMetricFineProfile", "UNC", "UNF", "UNEF", "NPT", "BSP", "BSW", "BSF", "ISOTyre", nullptr};
 const char* Hole::ClearanceMetricEnums[]             = { "Standard", "Close", "Wide", nullptr};
 const char* Hole::ClearanceUTSEnums[]                = { "Normal", "Close", "Loose", nullptr };
 const char* Hole::DrillPointEnums[]                  = { "Flat", "Angled", nullptr};
@@ -519,6 +519,29 @@ const Hole::ThreadDescription Hole::threadDescription[][171] =
         { "3 3/4",  95.250,   5.644,   0.0   },
         { "4",      101.600,  5.644,   0.0   },
         { "4 1/4",  107.950,  6.350,   0.0   },
+    },
+    /* ISO Tyre valve threads */
+    // ISO 4570:2002
+    {
+        { "5v1",  5.20, 0.705, 0 }, // Schrader internal
+        { "5v2",  5.20, 1.058, 0 }, // Presta cap
+        { "6v1",  6.00, 0.800, 0 }, // Presta body
+        { "8v1",  7.70, 0.794, 0 }, // Schrader external
+        { "9v1",  9.40, 0.794, 0 },
+        { "10v2", 10.3, 0.907, 0 },
+        { "12v1", 12.2, 0.977, 0 },
+        { "13v1", 12.6, 1.270, 0 },
+        { "8v2",  7.90, 1.058, 0 },
+        { "10v1", 9.60, 1.000, 0 },
+        { "11v1", 11.1, 1.270, 0 },
+        { "13v2", 12.7, 0.794, 0 },
+        { "15v1", 15.0, 1.000, 0 },
+        { "16v1", 15.8, 0.941, 0 },
+        { "17v1", 17.0, 1.000, 0 },
+        { "17v2", 17.5, 1.058, 0 },
+        { "17v3", 17.5, 1.588, 0 },
+        { "19v1", 19.0, 1.588, 0 },
+        { "20v1", 20.5, 1.000, 0 },
     }
 };
 
@@ -1513,6 +1536,19 @@ void Hole::onChanged(const App::Property* prop)
         else if (type == "BSF") {
             ThreadClass.setEnums(ThreadClass_BSF_Enums);
             HoleCutType.setEnums(HoleCutType_BSF_Enums);
+            Threaded.setReadOnly(false);
+            ThreadSize.setReadOnly(false);
+            ThreadFit.setReadOnly(Threaded.getValue());
+            Diameter.setReadOnly(true);
+            ModelThread.setReadOnly(!Threaded.getValue());
+            UseCustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue());
+            CustomThreadClearance.setReadOnly(!Threaded.getValue() || !ModelThread.getValue() || !UseCustomThreadClearance.getValue());
+            ThreadDepthType.setReadOnly(!Threaded.getValue());
+            ThreadDepth.setReadOnly(!Threaded.getValue());
+        }
+        else if (type == "ISOTyre") {
+            ThreadClass.setEnums(ThreadClass_None_Enums);
+            HoleCutType.setEnums(HoleCutType_None_Enums);
             Threaded.setReadOnly(false);
             ThreadSize.setReadOnly(false);
             ThreadFit.setReadOnly(Threaded.getValue());
