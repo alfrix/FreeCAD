@@ -61,15 +61,15 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
     QMetaObject::connectSlotsByName(this);
 
     ui->ThreadType->addItem(tr("None"), QByteArray("None"));
-    ui->ThreadType->addItem(tr("ISO metric regular profile"), QByteArray("ISO"));
-    ui->ThreadType->addItem(tr("ISO metric fine profile"), QByteArray("ISO"));
-    ui->ThreadType->addItem(tr("UTS coarse profile"), QByteArray("UTS"));
-    ui->ThreadType->addItem(tr("UTS fine profile"), QByteArray("UTS"));
-    ui->ThreadType->addItem(tr("UTS extra fine profile"), QByteArray("UTS"));
-    ui->ThreadType->addItem(tr("ANSI pipe profile"), QByteArray("NPT"));
-    ui->ThreadType->addItem(tr("BSP pipe profile"), QByteArray("BSP"));
-    ui->ThreadType->addItem(tr("BSW whitworth profile"), QByteArray("BSW"));
-    ui->ThreadType->addItem(tr("BSF whitworth fine profile"), QByteArray("BSF"));
+    ui->ThreadType->addItem(tr("ISO metric regular profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("ISO metric fine profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("UTS coarse profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("UTS fine profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("UTS extra fine profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("ANSI pipe profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("BSP pipe profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("BSW whitworth profile"), QByteArray("Clearance_enums"));
+    ui->ThreadType->addItem(tr("BSF whitworth fine profile"), QByteArray("Clearance_enums"));
 
     // read values from the hole properties
     auto pcHole = getObject<PartDesign::Hole>();
@@ -643,29 +643,16 @@ void TaskHoleParameters::threadTypeChanged(int index)
     // Threaded checkbox is meaningless if no thread profile is selected.
     ui->Threaded->setDisabled(std::string(hole->ThreadType.getValueAsString()) == "None");
 
-    if (TypeClass == QByteArray("ISO")) {
-        // the names of the clearance types are different in ISO and UTS
+    if (TypeClass == QByteArray("Clearance_enums")) {
         ui->ThreadFit->setItemText(
             0,
-            QCoreApplication::translate("TaskHoleParameters", "Standard", nullptr));
+            QCoreApplication::translate("TaskHoleParameters", "Normal / Standard", nullptr));
         ui->ThreadFit->setItemText(
             1,
-            QCoreApplication::translate("TaskHoleParameters", "Close", nullptr));
+            QCoreApplication::translate("TaskHoleParameters", "Tight / Close", nullptr));
         ui->ThreadFit->setItemText(
             2,
-            QCoreApplication::translate("TaskHoleParameters", "Wide", nullptr));
-    }
-    else if (TypeClass == QByteArray("UTS")) {
-        // the names of the clearance types are different in ISO and UTS
-        ui->ThreadFit->setItemText(
-            0,
-            QCoreApplication::translate("TaskHoleParameters", "Normal", nullptr));
-        ui->ThreadFit->setItemText(
-            1,
-            QCoreApplication::translate("TaskHoleParameters", "Close", nullptr));
-        ui->ThreadFit->setItemText(
-            2,
-            QCoreApplication::translate("TaskHoleParameters", "Loose", nullptr));
+            QCoreApplication::translate("TaskHoleParameters", "Loose / Wide", nullptr));
     }
 
     // Class and cut type
