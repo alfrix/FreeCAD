@@ -66,11 +66,10 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
     ui->ThreadType->addItem(tr("UTS coarse profile"), QByteArray("UTS"));
     ui->ThreadType->addItem(tr("UTS fine profile"), QByteArray("UTS"));
     ui->ThreadType->addItem(tr("UTS extra fine profile"), QByteArray("UTS"));
-    ui->ThreadType->addItem(tr("ANSI pipe profile"), QByteArray("NPT"));
-    ui->ThreadType->addItem(tr("BSP pipe profile"), QByteArray("BSP"));
-    ui->ThreadType->addItem(tr("BSW whitworth profile"), QByteArray("BSW"));
-    ui->ThreadType->addItem(tr("BSF whitworth fine profile"), QByteArray("BSF"));
-    ui->ThreadType->addItem(tr("ISO tyre valves profile"), QByteArray("ISOTyre"));
+    ui->ThreadType->addItem(tr("ANSI pipe profile"), QByteArray("None"));
+    ui->ThreadType->addItem(tr("BSP pipe profile"), QByteArray("None"));
+    ui->ThreadType->addItem(tr("BSW whitworth profile"), QByteArray("BS"));
+    ui->ThreadType->addItem(tr("BSF whitworth fine profile"), QByteArray("BS"));
 
     // read values from the hole properties
     auto pcHole = getObject<PartDesign::Hole>();
@@ -667,6 +666,14 @@ void TaskHoleParameters::threadTypeChanged(int index)
         ui->ThreadFit->setItemText(
             2,
             QCoreApplication::translate("TaskHoleParameters", "Loose", nullptr));
+    }
+    else if (TypeClass == QByteArray("BS")) {
+        ui->ThreadFit->setItemText(
+            0,
+            QCoreApplication::translate("TaskHoleParameters", "Medium", nullptr));
+        ui->ThreadFit->setItemText(
+            1,
+            QCoreApplication::translate("TaskHoleParameters", "Normal", nullptr));
     }
 
     // Class and cut type
