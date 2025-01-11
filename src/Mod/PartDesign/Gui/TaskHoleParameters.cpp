@@ -75,7 +75,8 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
     auto pcHole = getObject<PartDesign::Hole>();
 
     ui->Threaded->setChecked(pcHole->Threaded.getValue());
-    ui->Threaded->setDisabled(std::string(pcHole->ThreadType.getValueAsString()) == "None");
+    ui->Threaded->setHidden(std::string(pcHole->ThreadType.getValue() != 0L);
+    ui->ThreadGroupBox->setVisible(ui->Threaded.isChecked());
 
     ui->ThreadType->setCurrentIndex(pcHole->ThreadType.getValue());
 
@@ -85,7 +86,8 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
         ui->ThreadSize->addItem(tr(it.c_str()));
     }
     ui->ThreadSize->setCurrentIndex(pcHole->ThreadSize.getValue());
-    ui->ThreadSize->setEnabled(pcHole->ThreadType.getValue() != 0L);
+    ui->ThreadSize->setVisible(pcHole->ThreadType.getValue() != 0L);
+    ui->label_4->setVisible(pcHole->ThreadType.getValue() != 0L);
 
     ui->ThreadClass->clear();
     cursor = pcHole->ThreadClass.getEnumVector();
@@ -96,8 +98,9 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
     // Class is only enabled (sensible) if threaded
     ui->ThreadClass->setEnabled(pcHole->Threaded.getValue());
     ui->ThreadFit->setCurrentIndex(pcHole->ThreadFit.getValue());
-    // Fit is only enabled (sensible) if not threaded
-    ui->ThreadFit->setEnabled(!pcHole->Threaded.getValue() && pcHole->ThreadType.getValue() != 0L);
+    // Fit is only visible if not threaded
+    ui->ClearanceWidget->setVisible(
+        (!pcHole->Threaded.getValue() && pcHole->ThreadType.getValue() != 0L));
     ui->Diameter->setMinimum(pcHole->Diameter.getMinimum());
     ui->Diameter->setValue(pcHole->Diameter.getValue());
     // Diameter is only enabled if ThreadType is None
@@ -118,7 +121,16 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
     for (const auto& it : cursor) {
         ui->HoleCutType->addItem(tr(it.c_str()));
     }
-    ui->HoleCutType->setCurrentIndex(pcHole->HoleCutType.getValue());
+    int cutType = pcHole->HoleCutType.getValue();
+    ui->HoleCutType->setCurrentIndex(cutType);
+    bool isNotCut = cutType == 0;
+    ui->label_10->setHidden(isNotCut);
+    ui->label_11->setHidden(isNotCut);
+    ui->label_12->setHidden(isNotCut);
+    ui->HoleCutDiameter->setHidden(isNotCut);
+    ui->HoleCutDepth->setHidden(isNotCut);
+    ui->HoleCutCountersinkAngle->setHidden(isNotCut);
+    ui->HoleCutCustomValues->setHidden(cutType < 4);
     ui->HoleCutCustomValues->setChecked(pcHole->HoleCutCustomValues.getValue());
     ui->HoleCutCustomValues->setDisabled(pcHole->HoleCutCustomValues.isReadOnly());
     // HoleCutDiameter must not be smaller or equal than the Diameter
@@ -182,12 +194,11 @@ TaskHoleParameters::TaskHoleParameters(ViewProviderHole* HoleView, QWidget* pare
 
     // conditional enabling of thread modeling options
     ui->ModelThread->setEnabled(ui->Threaded->isChecked() && ui->ThreadType->currentIndex() != 0);
-    ui->UseCustomThreadClearance->setEnabled(ui->Threaded->isChecked()
-                                             && ui->ModelThread->isChecked());
-    ui->CustomThreadClearance->setEnabled(ui->Threaded->isChecked() && ui->ModelThread->isChecked()
-                                          && ui->UseCustomThreadClearance->isChecked());
+    ui->UseCustomThreadClearance->setVisible(ui->ModelThread->isEnabled());
+    ui->CustomThreadClearance->setVisible(ui->ModelThread->isEnabled());
+
     ui->UpdateView->setChecked(false);
-    ui->UpdateView->setEnabled(ui->ModelThread->isChecked());
+    ui->UpdateView->setVisible(ui->ModelThread->isEnabled());
 
     ui->Depth->setEnabled(std::string(pcHole->DepthType.getValueAsString()) == "Dimension");
     ui->ThreadDepthType->setEnabled(ui->Threaded->isChecked() && ui->ModelThread->isChecked());
@@ -414,14 +425,34 @@ void TaskHoleParameters::holeCutTypeChanged(int index)
     // we must do this after recomputeFeature() because this gives us the info if
     // the type is a countersink and thus if HoleCutCountersinkAngle can be enabled
     std::string HoleCutTypeString = hole->HoleCutType.getValueAsString();
-    if (HoleCutTypeString == "None" || HoleCutTypeString == "Counterbore"
-        || HoleCutTypeString == "Countersink" || HoleCutTypeString == "Counterdrill") {
-        ui->HoleCutCustomValues->setEnabled(false);
-        if (HoleCutTypeString == "None") {
+    bool isNotCut = HoleCutTypeString == "None";
+    ui->label_10->setHidden(isNotCut);
+    ui->label_11->setHidden(isNotCut);
+    ui->label_12->setHidden(isNotCut);
+    if (isNotCut) {
+            ui->HoleCutCustomValues->setEnabled(false);
+            ui->HoleCutCustomValues->setHidden(true);
+
             ui->HoleCutDiameter->setEnabled(false);
+            ui->HoleCutDiameter->setHidden(true);
+
             ui->HoleCutDepth->setEnabled(false);
+            ui->HoleCutDepth->setHidden(true);
+
             ui->HoleCutCountersinkAngle->setEnabled(false);
-        }
+            ui->HoleCutCountersinkAngle->setHidden(true);
+    }
+    else if (HoleCutTypeString == "Counterbore"
+        || HoleCutTypeString == "Countersink"
+        || HoleCutTypeString == "Counterdrill") {
+
+        ui->HoleCutCustomValues->setEnabled(false);
+        ui->HoleCutCustomValues->setVisible(false);
+
+        ui->HoleCutDiameter->setHidden(false);
+        ui->HoleCutDepth->setHidden(false);
+        ui->HoleCutCountersinkAngle->setHidden(false);
+
         if (HoleCutTypeString == "Counterbore") {
             ui->HoleCutCountersinkAngle->setEnabled(false);
         }
@@ -432,6 +463,11 @@ void TaskHoleParameters::holeCutTypeChanged(int index)
     else {  // screw definition
         // we can have the case that we have no normed values
         // in this case HoleCutCustomValues is read-only AND true
+        ui->HoleCutCustomValues->setVisible(true);
+        ui->HoleCutDepth->setHidden(false);
+        ui->HoleCutCountersinkAngle->setHidden(false);
+        ui->HoleCutDepth->setHidden(false);
+
         if (ui->HoleCutCustomValues->isChecked()) {
             ui->HoleCutDiameter->setEnabled(true);
             ui->HoleCutDepth->setEnabled(true);
@@ -640,8 +676,20 @@ void TaskHoleParameters::threadTypeChanged(int index)
     // now set the new type, this will reset the comboboxes to item 0
     hole->ThreadType.setValue(index);
 
-    // Threaded checkbox is meaningless if no thread profile is selected.
-    ui->Threaded->setDisabled(std::string(hole->ThreadType.getValueAsString()) == "None");
+    // None profile doesn't support threads.
+    if (std::string(hole->ThreadType.getValueAsString()) == "None") {
+        ui->Threaded->setHidden(true);
+        ui->ThreadGroupBox->setHidden(true);
+        ui->ClearanceWidget->setHidden(true);
+        ui->ThreadSize->setHidden(true);
+        ui->label_4->setHidden(true);
+    } else {
+        ui->Threaded->setHidden(false);
+        ui->ThreadGroupBox->setVisible(ui->Threaded->isChecked());
+        ui->ClearanceWidget->setHidden(ui->Threaded->isChecked());
+        ui->ThreadSize->setHidden(false);
+        ui->label_4->setHidden(false);
+    }
 
     if (TypeClass == QByteArray("Clearance_enums")) {
         ui->ThreadFit->setItemText(
