@@ -22,6 +22,9 @@
 
 #include "PreCompiled.h"
 
+#include <BRepAdaptor_Curve.hxx>
+#include <BRepBuilderAPI_MakeEdge.hxx>
+#include <BRepBuilderAPI_Transform.hxx>
 #include <Base/Console.h>
 
 #include "CenterLine.h"
@@ -31,6 +34,24 @@
 #include "DrawUtil.h"
 #include "DrawViewPart.h"
 #include "GeometryObject.h"
+
+#include <App/Document.h>
+#include <Mod/PartDesign/App/Body.h>
+#include <Mod/PartDesign/App/Feature.h>
+#include <Mod/PartDesign/App/FeatureHole.h>
+
+#include <BRepGProp.hxx>
+#include <BRepBndLib.hxx>
+#include <Geom_Line.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <BRep_Builder.hxx>
+#include <BRepAdaptor_Surface.hxx>
+#include <gp_Dir.hxx>
+#include <Precision.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Face.hxx>
+#include <TopExp_Explorer.hxx>
+#include <gp_Quaternion.hxx>
 
 using namespace TechDraw;
 using namespace std;
@@ -303,6 +324,157 @@ void CosmeticExtension::addCosmeticEdgesToGeom()
         //        int iGE =
         getOwner()->getGeometryObject()->addCosmeticEdge(scaledGeom, ce->getTagAsString());
     }
+}
+
+void TechDraw::CosmeticExtension::addCosmeticThreads()
+{
+    TechDraw::DrawViewPart* ownerView = getOwner();
+    if (!ownerView) {
+        Base::Console().error("techdraw: cosmeticextension::addcosmeticthreads - owner is not a drawviewpart or null.\n");
+        return;
+    }
+    if (ownerView->Source.getSize() == 0 || ownerView->Source[0] == nullptr) {
+        Base::Console().warning("techdraw: drawviewpart has no valid source object.\n");
+        return;
+    }
+
+    Part::Feature* sourceFeature = dynamic_cast<Part::Feature*>(ownerView->Source[0]);
+    if (!sourceFeature) {
+        Base::Console().warning("techdraw: source object is not a part::feature.\n");
+        return;
+    }
+
+    App::Document* doc = ownerView->getDocument();
+    if (!doc) {
+        Base::Console().warning("techdraw: drawviewpart has no document, cannot find source features.\n");
+        return;
+    }
+
+    std::vector<PartDesign::Hole*> threadedHoles;
+    if (sourceFeature->isDerivedFrom(PartDesign::Hole::getClassTypeId())) {
+        auto* hole = static_cast<PartDesign::Hole*>(sourceFeature);
+        if (hole->Threaded.getValue()) { threadedHoles.push_back(hole); }
+    } else if (sourceFeature->isDerivedFrom(PartDesign::Body::getClassTypeId())) {
+        auto* body = dynamic_cast<PartDesign::Body*>(sourceFeature);
+        if (body) {
+            for (auto* obj : body->getObjects()) {
+                auto* feature = dynamic_cast<Part::Feature*>(obj);
+                if (feature && feature->isDerivedFrom(PartDesign::Hole::getClassTypeId())) {
+                    auto* hole = static_cast<PartDesign::Hole*>(feature);
+                    if (hole && hole->Threaded.getValue()) { threadedHoles.push_back(hole); }
+                }
+            }
+        }
+    }
+
+    if (threadedHoles.empty()) {
+        Base::Console().message("techdraw: no threaded holes found.\n");
+        return;
+    }
+
+    gp_Dir viewDir(ownerView->Direction.getValue().x, ownerView->Direction.getValue().y, ownerView->Direction.getValue().z);
+
+    GProp_GProps props;
+    TopoDS_Shape wholeShape = sourceFeature->Shape.getValue();
+    BRepGProp::VolumeProperties(wholeShape, props);
+    gp_Pnt centroid = props.CentreOfMass();
+
+    for (auto* hole : threadedHoles) {
+        TopoDS_Shape holeShape = hole->Shape.getValue();
+        if (holeShape.IsNull()) { continue; }
+
+        Base::Placement placement = hole->Placement.getValue();
+        Base::Matrix4D mat = placement.toMatrix();
+        gp_Trsf holeTrsf;
+        holeTrsf.SetValues(
+            mat[0][0], mat[0][1], mat[0][2], mat[0][3],
+            mat[1][0], mat[1][1], mat[1][2], mat[1][3],
+            mat[2][0], mat[2][1], mat[2][2], mat[2][3]
+        );
+
+        TopoDS_Face mainCylinderFace;
+        double bestScore = 0.0;
+        for (TopExp_Explorer ex(holeShape, TopAbs_FACE); ex.More(); ex.Next()) {
+            TopoDS_Face face = TopoDS::Face(ex.Current());
+            BRepAdaptor_Surface surf(face);
+            if (surf.GetType() != GeomAbs_Cylinder) { continue; }
+            gp_Cylinder cyl = surf.Cylinder();
+            gp_Dir dir_global = cyl.Axis().Direction().Transformed(holeTrsf);
+            double score = (1.0 - std::abs(viewDir.Dot(dir_global))) * cyl.Radius();
+            if (score > bestScore) {
+                bestScore = score;
+                mainCylinderFace = face;
+            }
+        }
+        if (mainCylinderFace.IsNull()) { continue; }
+
+        gp_Cylinder cylinder_local = BRepAdaptor_Surface(mainCylinderFace).Cylinder();
+        gp_Ax1 axis_global = cylinder_local.Axis().Transformed(holeTrsf);
+        if (viewDir.IsParallel(axis_global.Direction(), Precision::Confusion())) { continue; }
+
+        gp_Pnt frontCircleCenter;
+        double minDistance = std::numeric_limits<double>::max();
+        for (TopExp_Explorer edgeExp(mainCylinderFace, TopAbs_EDGE); edgeExp.More(); edgeExp.Next()) {
+            TopoDS_Edge edge = TopoDS::Edge(edgeExp.Current());
+            BRepAdaptor_Curve curve(edge);
+            if (curve.GetType() == GeomAbs_Circle) {
+                gp_Pnt center_local = curve.Circle().Location();
+                gp_Pnt center_global = center_local.Transformed(holeTrsf);
+                double distance = center_global.SquareDistance(ownerView->getProjectionCS().Location());
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    frontCircleCenter = center_global;
+                }
+            }
+        }
+
+        if (frontCircleCenter.SquareDistance(gp_Pnt(0,0,0)) == 0) { continue; }
+
+        gp_Pnt start_3D = frontCircleCenter.Translated(gp_Vec(centroid.X()*-1, centroid.Y()*-1, centroid.Z()*-1));
+
+        gp_Vec holeAxisVec(axis_global.Direction());
+        if (viewDir.Dot(holeAxisVec) > 0) {
+            holeAxisVec.Reverse();
+        }
+
+        gp_Pnt end_3D = start_3D.Translated(holeAxisVec * hole->ThreadDepth.getValue());
+
+        Base::Vector3d p_start_proj = ownerView->projectPoint(Base::Vector3d(start_3D.X(), start_3D.Y(), start_3D.Z()), true);
+        Base::Vector3d p_end_proj = ownerView->projectPoint(Base::Vector3d(end_3D.X(), end_3D.Y(), end_3D.Z()), true);
+
+        // This is a debug vertex, its position is not important and will be removed later on.
+        m_cosmeticThreadTags.push_back(ownerView->addCosmeticVertex(p_start_proj));
+        m_cosmeticThreadTags.push_back(ownerView->addCosmeticVertex(p_end_proj));
+
+        Base::Vector3d threadDir_2D = p_end_proj - p_start_proj;
+        if (threadDir_2D.Length() < Precision::Confusion()) { continue; }
+        threadDir_2D.Normalize();
+
+        // Corrected cross-product using gp_Vec from OpenCASCADE
+        gp_Vec hole_axis_vec_gp(holeAxisVec.X(), holeAxisVec.Y(), holeAxisVec.Z());
+        gp_Vec view_dir_vec_gp(viewDir.X(), viewDir.Y(), viewDir.Z());
+
+        gp_Vec offset_3D_dir_gp = hole_axis_vec_gp.Crossed(view_dir_vec_gp);
+
+        Base::Vector3d offset_3D_dir(offset_3D_dir_gp.X(), offset_3D_dir_gp.Y(), offset_3D_dir_gp.Z());
+        offset_3D_dir.Normalize();
+
+        Base::Vector3d offset_2D = ownerView->projectPoint(offset_3D_dir, false);
+        offset_2D.Normalize();
+
+        double threadRadius = hole->ThreadDiameter.getValue() / 2.0;
+
+        Base::Vector3d p0 = p_start_proj + offset_2D * threadRadius;
+        Base::Vector3d p1 = p_end_proj + offset_2D * threadRadius;
+        Base::Vector3d p2 = p_start_proj - offset_2D * threadRadius;
+        Base::Vector3d p3 = p_end_proj - offset_2D * threadRadius;
+
+        m_cosmeticThreadTags.push_back(ownerView->addCosmeticEdge(p0, p1));
+        m_cosmeticThreadTags.push_back(ownerView->addCosmeticEdge(p2, p3));
+        m_cosmeticThreadTags.push_back(ownerView->addCosmeticEdge(p1, p3));
+    }
+
+    Base::Console().message("Finished adding cosmetic threads.\n");
 }
 
 /// add a single cosmetic edge to the geometry edge list

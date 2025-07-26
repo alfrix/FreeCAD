@@ -24,6 +24,7 @@ include_directories(
     ${QtCore_INCLUDE_DIR}
     ${QtGui_INCLUDE_DIR}
     ${QtWidgets_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src/3rdParty/json/single_include/nlohmann/
 )
 
 list(APPEND TechDrawLIBS

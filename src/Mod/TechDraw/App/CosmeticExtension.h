@@ -34,7 +34,6 @@
 #include "PropertyCosmeticVertexList.h"
 #include "PropertyGeomFormatList.h"
 
-
 namespace TechDraw {
 class DrawViewPart;
 class GeometryObject;
@@ -73,6 +72,7 @@ public:
     virtual void            clearCosmeticEdges();
     virtual int             add1CEToGE(const std::string& tag);
     virtual void            addCosmeticEdgesToGeom();
+    virtual void            addCosmeticThreads();
     virtual void            refreshCEGeoms();
 
     virtual void refreshCLGeoms();
@@ -102,7 +102,7 @@ public:
     PyObject* getExtensionPyObject() override;
 
 private:
-
+    std::vector<std::string> m_cosmeticThreadTags;
 };
 
 using CosmeticExtensionPython = App::ExtensionPythonT<CosmeticExtension>;

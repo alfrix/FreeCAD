@@ -450,6 +450,7 @@ void DrawViewPart::postHlrTasks()
     //add geometry that doesn't come from HLR
     addCosmeticVertexesToGeom();
     addCosmeticEdgesToGeom();
+    addCosmeticThreads();
     addReferencesToGeom();
     addPoints();
 
