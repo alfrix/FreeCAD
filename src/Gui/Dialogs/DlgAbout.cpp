@@ -199,9 +199,11 @@ void AboutDialog::setupLabels()
 #endif
     // avoid overriding user set style sheet
     if (qApp->styleSheet().isEmpty()) {
-        setStyleSheet(
-            QStringLiteral("Gui--Dialog--AboutDialog QLabel {font-size: %1pt;}").arg(fontSize)
-        );
+        for (auto* label : findChildren<QLabel*>()) {
+            QFont font = label->font();
+            font.setPointSize(fontSize);
+            label->setFont(font);
+        }
     }
 
     QString exeName = qApp->applicationName();
