@@ -228,12 +228,6 @@ void AboutDialog::setupLabels()
     ui->labelAuthor->setText(author);
     ui->labelAuthor->setUrl(mturl);
 
-    if (qApp->styleSheet().isEmpty()) {
-        ui->labelAuthor->setStyleSheet(QStringLiteral(
-            "Gui--UrlLabel {color: #0000FF;text-decoration: underline;font-weight: 600;}"
-        ));
-    }
-
     QString version = ui->labelBuildVersion->text();
     version.replace(
         QStringLiteral("Unknown"),

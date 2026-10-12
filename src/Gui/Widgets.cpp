@@ -39,7 +39,6 @@
 #include <QTimer>
 #include <QToolTip>
 
-
 #include <Base/Exception.h>
 #include <Base/Interpreter.h>
 #include <App/DocumentObject.h>
@@ -810,9 +809,12 @@ UrlLabel::UrlLabel(QWidget* parent, Qt::WindowFlags f)
 {
     setToolTip(this->_url);
     setCursor(Qt::PointingHandCursor);
-    if (qApp->styleSheet().isEmpty()) {
-        setStyleSheet(QStringLiteral("Gui--UrlLabel {color: #0000FF;text-decoration: underline;}"));
-    }
+    auto labelFont = font();
+    labelFont.setUnderline(true);
+    setFont(labelFont);
+    auto pal = palette();
+    pal.setColor(QPalette::WindowText, pal.color(QPalette::Link));
+    setPalette(pal);
 }
 
 UrlLabel::~UrlLabel() = default;
