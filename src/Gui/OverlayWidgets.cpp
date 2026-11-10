@@ -59,6 +59,7 @@
 #include "ComboView.h"
 #include "Command.h"
 #include "Control.h"
+#include "GuiApplication.h"
 #include "MainWindow.h"
 #include "MDIView.h"
 #include "NaviCube.h"
@@ -471,6 +472,10 @@ OverlayTabWidget::OverlayTabWidget(QWidget* parent, Qt::DockWidgetArea pos)
     _animator->setStartValue(0.0);
     _animator->setEndValue(1.0);
     connect(_animator, &QAbstractAnimation::stateChanged, this, &OverlayTabWidget::onAnimationStateChanged);
+
+    if (auto* app = qobject_cast<GUIApplication*>(qApp)) {
+        connect(app, &GUIApplication::applicationPaletteChanged, this, &OverlayTabWidget::updateColors);
+    }
 }
 
 OverlayTabWidget::~OverlayTabWidget()
@@ -1558,6 +1563,37 @@ bool OverlayTabWidget::onEscape()
     return false;
 }
 
+void OverlayTabWidget::updateColors(const QPalette& palette)
+{
+    autoModeMenu.setPalette(palette);
+    refreshIcons();
+    clearStyleSheet();
+    refreshStyleSheet();
+}
+
+void OverlayTabWidget::clearStyleSheet()
+{
+    // Stylesheet must be cleared to allow light/dark palette transitions
+    proxyWidget->setStyleSheet(QString());
+    setStyleSheet(QString());
+}
+
+void OverlayTabWidget::refreshStyleSheet()
+{
+    QString stylesheet = OverlayManager::instance()->getStyleSheet();
+    auto applyStyleSheet = [](QWidget* w, const QString& s) {
+        if (w->styleSheet() != s) {
+            w->setStyleSheet(s);
+        }
+        else {
+            w->style()->unpolish(w);
+            w->style()->polish(w);
+        }
+    };
+    applyStyleSheet(proxyWidget, stylesheet);
+    applyStyleSheet(this, stylesheet);
+}
+
 void OverlayTabWidget::setOverlayMode(bool enable)
 {
     overlaid = enable;
@@ -1578,8 +1614,6 @@ void OverlayTabWidget::setOverlayMode(bool enable)
         }
     }
 
-    QString stylesheet;
-    stylesheet = OverlayManager::instance()->getStyleSheet();
     currentTransparent = isTransparent();
 
     OverlayOption option;
@@ -1597,17 +1631,8 @@ void OverlayTabWidget::setOverlayMode(bool enable)
     }
     setProperty("transparent", option != OverlayOption::Disable);
 
-    auto refreshStyleSheet = [](QWidget* w, const QString& s) {
-        if (w->styleSheet() != s) {
-            w->setStyleSheet(s);
-        }
-        else {
-            w->style()->unpolish(w);
-            w->style()->polish(w);
-        }
-    };
-    refreshStyleSheet(proxyWidget, stylesheet);
-    refreshStyleSheet(this, stylesheet);
+    refreshStyleSheet();
+
     setOverlayMode(this, option);
 
     _graphicsEffect->setEnabled(effectEnabled() && (enable || isTransparent()));

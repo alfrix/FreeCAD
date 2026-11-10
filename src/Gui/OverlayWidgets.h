@@ -32,6 +32,7 @@
 #include <QDockWidget>
 #include <QSplitter>
 #include <QMenu>
+#include <QPalette>
 
 #include <Base/Parameter.h>
 
@@ -89,6 +90,11 @@ public:
      */
     OverlayTabWidget(QWidget* parent, Qt::DockWidgetArea pos);
     ~OverlayTabWidget() override;
+
+    void updateColors(const QPalette& palette);
+    void refreshStyleSheet();
+    void clearStyleSheet();
+
 
     /// Enable/disable overlay mode for this tab widget
     void setOverlayMode(bool enable);

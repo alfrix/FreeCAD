@@ -27,6 +27,8 @@
 #include <Base/Interpreter.h>  // For Base::SystemExitException
 #include <Base/Parameter.h>
 #include <QList>
+#include <QPalette>
+
 #include <memory>
 
 class QSessionManager;
@@ -54,10 +56,23 @@ public:
     /// Pointer to exceptions caught in Qt event handler
     std::shared_ptr<Base::SystemExitException> caughtException;
 
+Q_SIGNALS:
+    /**
+     * Emitted when the application palette changes.
+     *
+     * This exists using setPalette() on a parent widget
+     * doesn't guarantee that every descendant gets
+     * a native PaletteChange event.
+     */
+    void applicationPaletteChanged(const QPalette& palette);
+
+
 public Q_SLOTS:
     void commitData(QSessionManager& manager);
 
 protected:
+    QPalette themePalette() const;
+
     bool event(QEvent* event) override;
 };
 

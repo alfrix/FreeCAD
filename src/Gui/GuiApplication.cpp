@@ -41,6 +41,8 @@
 #include <QFileOpenEvent>
 #include <QSessionManager>
 #include <QTimer>
+#include <QLabel>
+#include <QPalette>
 
 
 #include <QLocalServer>
@@ -177,8 +179,22 @@ void GUIApplication::commitData(QSessionManager& manager)
     }
 }
 
+QPalette GUIApplication::themePalette() const
+{
+    if (styleSheet().isEmpty()) {
+        return palette();
+    }
+    QLabel probe;
+    probe.ensurePolished();
+    return probe.palette();
+}
+
 bool GUIApplication::event(QEvent* ev)
 {
+    if (ev->type() == QEvent::ApplicationPaletteChange) {
+        Q_EMIT applicationPaletteChanged(themePalette());
+    }
+
     if (ev->type() == QEvent::FileOpen) {
         // (macOS workaround when opening FreeCAD by opening a .FCStd file in 1.0)
         // With the current implementation of the splash screen boot procedure, Qt will

@@ -153,14 +153,7 @@ private:
 
         if (overlayStyleSheet.isEmpty()) {
             // User did not choose any stylesheet, we need to choose one based on main stylesheet
-            if (mainStyleSheet.contains(QStringLiteral("light"), Qt::CaseInsensitive)) {
-                overlayStyleSheet = QStringLiteral("overlay:Light Theme + Dark Background.qss");
-            }
-            else {
-                // by default FreeCAD uses somewhat dark background for 3D View.
-                // if user has not explicitly selected light theme, the "Dark Outline" looks best
-                overlayStyleSheet = QStringLiteral("overlay:Dark Theme + Dark Background.qss");
-            }
+            overlayStyleSheet = QStringLiteral("overlay:Freecad Overlay.qss");
         }
         else if (!overlayStyleSheet.isEmpty() && !QFile::exists(overlayStyleSheet)) {
             // User did choose one of predefined stylesheets, we need to qualify it with namespace
@@ -186,7 +179,7 @@ private:
     static const QString _default;
 };
 
-const QString OverlayStyleSheet::_default = QStringLiteral("overlay:Light Theme + Dark Background.qss");
+const QString OverlayStyleSheet::_default = QStringLiteral("overlay:Freecad Overlay.qss");
 
 // -----------------------------------------------------------
 
